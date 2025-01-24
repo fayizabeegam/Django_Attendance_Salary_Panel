@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}signup{% endblock %}
+
+{% with True as is_signup_page %}
+{% with False as show_navbar %}
+
+{% block signup_content %}
+<section class="vh-100 bg-image" style = "background: linear-gradient(180deg, #8B008B, #0000FF)">
+  <div class="mask d-flex align-items-center h-100 gradient-custom-3">
+    <div class="container h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+          <div class="card bg-dark text-white" style="border-radius: 10px;" >
+            <div class="card-body p-5">
+              <h2 class="text-uppercase text-center mb-5">Create an account</h2>
+
+              <form method="post" action="{% url 'accounts:signup' %}">
+                {% csrf_token %}
+                <div data-mdb-input-init class="form-outline mb-3">
+                  <input type="text" id="form3Example1cg" name="username" class="form-control form-control-lg" placeholder="Username" required/>
+                  {% if form.username.errors %}
+                    <div class="text-danger">
+                      {% for error in form.username.errors %}
+                        <p>{{ error }}</p>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div data-mdb-input-init class="form-outline mb-3">
+                  <input type="text" id="form3Example1cg" name="mobile" class="form-control form-control-lg" placeholder="Mobile" required/>
+                  {% if form.mobile.errors %}
+                    <div class="text-danger">
+                      {% for error in form.mobile.errors %}
+                        <p>{{ error }}</p>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+
+                </div>
+
+                <div data-mdb-input-init class="form-outline mb-3">
+                    <input type="text" id="form3Example3cg" name="IFID" class="form-control form-control-lg" min="0" placeholder="IFID" required />
+                    {% if form.IFID.errors %}
+                    <div class="text-danger">
+                      {% for error in form.IFID.errors %}
+                        <p>{{ error }}</p>
+                      {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                  
+
+                <div data-mdb-input-init class="form-outline mb-3">
+                  <input type="email" id="form3Example3cg" name="email" class="form-control form-control-lg" placeholder="Email"  required/>
+                  {% if form.email.errors %}
+                    <div class="text-danger">
+                      {% for error in form.email.errors %}
+                        <p>{{ error }}</p>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div data-mdb-input-init class="form-outline mb-3">
+                  <input type="password" id="form3Example4cg" name="Password" class="form-control form-control-lg"  placeholder="Password" required/>
+                  {% if form.password.errors %}
+                    <div class="text-danger">
+                      {% for error in form.password.errors %}
+                        <p>{{ error }}</p>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div data-mdb-input-init class="form-outline mb-3">
+                  <input type="password" id="form3Example4cdg" name="ConfirmPassword" class="form-control form-control-lg" placeholder="Confirm Password" required/>
+                  {% if form.ConfirmPassword.errors %}
+                  <div class="text-danger">
+                    {% for error in form.ConfirmPassword.errors %}
+                      <p>{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-center">
+                  <button  type="submit" data-mdb-button-init
+                    data-mdb-ripple-init class="btn btn-outline-light  btn-lg px-5" >Register</button>
+                </div>
+
+                <p class="text-center text-muted mt-5 mb-0">Have already an account? <a href="{% url 'accounts:signin' %}"
+                    class="fw-bold text-body text-white-50 "><u>Login here</u></a></p>
+
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% endwith %}
+{% endwith %}

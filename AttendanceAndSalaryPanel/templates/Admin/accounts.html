@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Accounts{% endblock %}
+
+{% with False as is_signin_page %}
+{% with False as is_signup_page %}
+{% with True as show_navbar %}
+
+
+
+{% block default_content %}
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="row mb-4">
+            <div class="col-12 d-flex justify-content-end">
+                <!-- Upload Form -->
+                <form id="uploadForm" enctype="multipart/form-data" action="{% url 'adminapp:upload-employee-details' %}" method="post">
+                    {% csrf_token %}
+                    <div class="btn-group ms-auto">
+                        <!-- Hidden File Input -->
+                        <input type="file" id="excelFile" name="excelFile" class="d-none" onchange="this.form.submit();">
+                        
+                        <!-- Upload Button -->
+                        <button type="button" class="btn btn-primary bg-gradient-primary me-2" onclick="document.getElementById('excelFile').click();">
+                            Upload <i class="mdi mdi-upload"></i>
+                        </button>
+                        
+                        <!-- Add Employee Button -->
+                        <button type="button" class="btn btn-success bg-gradient-success" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                            Add <i class="mdi mdi-plus"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Success or Error Messages -->
+        {% if success %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ success }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        </div>
+        {% endif %}
+        {% if error %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" >
+            {{ error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+        
+        <div class="search-field d-none d-md-block">
+            <form class="d-flex align-items-center h-100" action="{% url "adminapp:search-employee" %}">
+              <div class="input-group">
+                <div class="input-group-prepend bg-transparent">
+                  <i class="input-group-text border-0 mdi mdi-magnify bg-transparent"></i>
+                </div>
+                <input type="text" class="form-control bg-transparent border-0"  name="search_query" placeholder="Search" value="{{ request.GET.search_query  }}">
+              </div>
+            </form>
+        </div>
+        <!-- Employee List -->
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Employees List</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Employee Name</th>
+                                    <th>IFID</th>
+                                    <th>Mobile Number</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for employee in employees %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ employee.EmpName }}</td>
+                                    <td>{{ employee.IFID }}</td>
+                                    <td>{{ employee.Mobile }}</td>
+                                    <td>
+                                        <button type="button" 
+                                            class="btn btn-warning bg-gradient-warning btn-sm" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#exampleModalCenter" 
+                                            data-id="{{ employee.pk }}"
+                                            data-name="{{ employee.EmpName }}"
+                                            data-ifid="{{ employee.IFID }}"
+                                            data-mobile="{{ employee.Mobile }}">
+                                            Edit
+                                        </button>
+
+                                        <!-- Delete Button triggers Delete Modal -->
+                                        <button type="button" 
+                                            class="btn btn-danger bg-gradient-danger btn-sm" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteEmployeeModal" 
+                                            data-id="{{ employee.pk }}" 
+                                            data-name="{{ employee.EmpName }}">
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No employees found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add Employee Modal -->
+<div class="modal" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom: 1px solid #ddd;">
+                <h5 class="modal-title" id="addEmployeeModalLabel">Add Employee</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'adminapp:add-employees' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <input type="text" class="form-control rounded-pill" id="ifid" name="IFID" placeholder="IFID" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" class="form-control rounded-pill" id="empname" name="EmpName" placeholder="Employee Name" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" class="form-control rounded-pill" id="mobile" name="Mobile" placeholder="Mobile Number" required>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #ddd;">
+                    <button type="button" class="btn btn-secondary bg-gradient-dark" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary bg-gradient-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Employee Modal -->
+<div class="modal" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom: 1px solid #ddd;">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Edit Employee</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="" id="editEmployeeForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <input type="text" class="form-control rounded-pill" name="IFID" id="edit_ifid" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" class="form-control rounded-pill" name="EmpName" id="edit_empname" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" class="form-control rounded-pill" name="Mobile" id="edit_mobile" required>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #ddd;">
+                    <button type="button" class="btn btn-secondary bg-gradient-dark" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary  bg-gradient-primary">Save Changes</button>
+                </div>
+            </form>                   
+        </div>
+    </div>
+</div>
+
+
+<!-- Delete Employee Modal -->
+<div class="modal" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom: 1px solid #ddd;">
+                <h5 class="modal-title" id="deleteEmployeeModalLabel">Delete Employee</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete <strong id="deleteEmployeeName"></strong>?
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #ddd;">
+                <button type="button" class="btn btn-secondary bg-gradient-dark" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" action="" id="deleteForm">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger bg-gradient-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
