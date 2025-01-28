@@ -1,13 +1,15 @@
 from django.shortcuts import render,redirect
 from .models import*
 from .forms import*
-from django.core.mail import send_mail
+from django.core.mail import send_mail,EmailMultiAlternatives
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
-from django.views.generic import CreateView,FormView
+from django.views.generic import CreateView,FormView,View
 from django.contrib.auth import login,authenticate
-from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.forms import SetPasswordForm
+from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.tokens import default_token_generator
@@ -35,8 +37,15 @@ class UserRegistrationView(CreateView):
                 return self.form_invalid(form)
 
             # Check if the User already exists
-            if User.objects.filter(mobile=mobile).exists():
-                form.add_error(None, "A user with this mobile number already exists.")
+            existing_user = User.objects.filter(mobile=mobile).first()
+            if existing_user:
+                # Check if the existing user matches the employee
+                if existing_user.employee != employee:
+                    form.add_error(None, "A user with this mobile number already exists and is not associated with the given Employee.")
+                    return self.form_invalid(form)
+
+                # Allow registration if the user matches the employee (e.g., same mobile and IFID)
+                form.add_error(None, "You are already registered. Please log in.")
                 return self.form_invalid(form)
                 
             user = form.save(commit=False)
@@ -120,31 +129,83 @@ class UserLoginView(FormView):
 
 
 
-class PasswordResetView(FormView):
-    template_name = 'password_reset_request.html'
-    form_class = PasswordResetForm
-    success_url = reverse_lazy('accounts:signin')
+# class PasswordResetView(FormView):
+#     template_name = 'password_reset_request.html'
+#     form_class = PasswordResetForm
+#     success_url = reverse_lazy('accounts:forgot-password')
 
-    def form_valid(self, form):
-        email = form.cleaned_data['email']
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            messages.error(self.request, "This email address is not registered.")
-            return self.form_invalid(self, form)
+#     def form_valid(self, form):
+#         email = form.cleaned_data['email']
+#         try:
+#             user = User.objects.get(email=email)
+#         except User.DoesNotExist:
+#             messages.error(self.request, "This email address is not registered.")
+#             return self.form_invalid(form)
 
-        token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(user.pk.encode())
+#         token = default_token_generator.make_token(user)
+#         uid = urlsafe_base64_encode(str(user.pk).encode())
 
-        reset_url = f"{get_current_site(self.request).domain}/accounts/reset_password/{uid}/{token}/"
+#         reset_url = f"{self.request.scheme}://{get_current_site(self.request).domain}/accounts/reset_password/{uid}/{token}/"
 
-        # Send password reset email
-        subject = "Password Reset Request"
-        message = render_to_string("password_reset_email.html", {
-            "reset_url": reset_url,
-            "user": user
-        })
-        send_mail(subject, message, "no-reply@example.com", [email])
+#         # Send password reset email
+#         subject = "Password Reset Request"
+#         message = render_to_string("password_reset_email.html", {
+#             "reset_url": reset_url,
+#             "user": user
+#         })
+#         send_mail(subject, message, "no-reply@example.com", [email])
         
-        messages.success(self.request, "Password reset email has been sent.")
-        return redirect(self.success_url)
+#         messages.success(self.request, "Password reset email has been sent.")
+#         return redirect(self.success_url)
+
+
+
+# class PasswordResetConfirmView(View):
+#     template_name = 'password_reset_confirm.html'
+
+#     def get(self, request, uidb64, token):
+#         try:
+#             uid = urlsafe_base64_decode(uidb64).decode()
+#             user = User.objects.get(pk=uid)
+#         except (User.DoesNotExist, ValueError):
+#             user = None
+
+#         if user and default_token_generator.check_token(user, token):
+#             form = SetPasswordForm(user)
+#             return render(request, self.template_name, {'form': form, 'uidb64': uidb64, 'token': token})
+#         else:
+#             messages.error(request, "The password reset link is invalid or has expired.")
+#             return redirect('accounts:signin')
+
+#     def post(self, request, uidb64, token):
+#         try:
+#             uid = urlsafe_base64_decode(uidb64).decode()
+#             user = User.objects.get(pk=uid)
+#         except (User.DoesNotExist, ValueError):
+#             user = None
+
+#         if user and default_token_generator.check_token(user, token):
+#             form = SetPasswordForm(user, request.POST)
+#             if form.is_valid():
+#                 form.save()
+#                 messages.success(request, "Your password has been reset successfully. Please sign in.")
+#                 return redirect('accounts:signin')
+#             return render(request, self.template_name, {'form': form, 'uidb64': uidb64, 'token': token})
+#         else:
+#             messages.error(request, "The password reset link is invalid.")
+#             return redirect('accounts:signin')
+
+
+
+class CustomPasswordResetView(PasswordResetView):
+    def send_mail(self, subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None):
+        subject = render_to_string(subject_template_name, context)
+        subject = ''.join(subject.splitlines())
+        body = render_to_string(email_template_name, context)
+
+        # Use EmailMultiAlternatives to send HTML and plain text
+        email_message = EmailMultiAlternatives(subject, body, from_email, [to_email])
+        if html_email_template_name:
+            html_email = render_to_string(html_email_template_name, context)
+            email_message.attach_alternative(html_email, "text/html")
+        email_message.send()

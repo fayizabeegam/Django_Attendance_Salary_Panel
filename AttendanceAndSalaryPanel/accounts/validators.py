@@ -33,9 +33,9 @@ class CustomPasswordValidator:
                 code='password_too_short',
             )
         
-        def get_help_text(self):
-            return _(
-            "Your password must contain at least one uppercase letter, one lowercase letter, one digit, "
-            "one special character (!@#$%^&*()_+), and be at least 8 characters long."
-            )
-        
+    def get_help_text(self):
+        return _(
+        "Your password must contain at least one uppercase letter, one lowercase letter, one digit, "
+        "one special character (!@#$%^&*()_+), and be at least 8 characters long."
+        )
+    
