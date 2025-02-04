@@ -39,11 +39,6 @@ class UserRegistrationView(CreateView):
             # Check if the User already exists
             existing_user = User.objects.filter(mobile=mobile).first()
             if existing_user:
-                # Check if the existing user matches the employee
-                if existing_user.employee != employee:
-                    form.add_error(None, "A user with this mobile number already exists and is not associated with the given Employee.")
-                    return self.form_invalid(form)
-
                 # Allow registration if the user matches the employee (e.g., same mobile and IFID)
                 form.add_error(None, "You are already registered. Please log in.")
                 return self.form_invalid(form)
@@ -126,74 +121,6 @@ class UserLoginView(FormView):
         # Re-render the form with errors
         return self.render_to_response(self.get_context_data(form=form)) 
     
-
-
-
-# class PasswordResetView(FormView):
-#     template_name = 'password_reset_request.html'
-#     form_class = PasswordResetForm
-#     success_url = reverse_lazy('accounts:forgot-password')
-
-#     def form_valid(self, form):
-#         email = form.cleaned_data['email']
-#         try:
-#             user = User.objects.get(email=email)
-#         except User.DoesNotExist:
-#             messages.error(self.request, "This email address is not registered.")
-#             return self.form_invalid(form)
-
-#         token = default_token_generator.make_token(user)
-#         uid = urlsafe_base64_encode(str(user.pk).encode())
-
-#         reset_url = f"{self.request.scheme}://{get_current_site(self.request).domain}/accounts/reset_password/{uid}/{token}/"
-
-#         # Send password reset email
-#         subject = "Password Reset Request"
-#         message = render_to_string("password_reset_email.html", {
-#             "reset_url": reset_url,
-#             "user": user
-#         })
-#         send_mail(subject, message, "no-reply@example.com", [email])
-        
-#         messages.success(self.request, "Password reset email has been sent.")
-#         return redirect(self.success_url)
-
-
-
-# class PasswordResetConfirmView(View):
-#     template_name = 'password_reset_confirm.html'
-
-#     def get(self, request, uidb64, token):
-#         try:
-#             uid = urlsafe_base64_decode(uidb64).decode()
-#             user = User.objects.get(pk=uid)
-#         except (User.DoesNotExist, ValueError):
-#             user = None
-
-#         if user and default_token_generator.check_token(user, token):
-#             form = SetPasswordForm(user)
-#             return render(request, self.template_name, {'form': form, 'uidb64': uidb64, 'token': token})
-#         else:
-#             messages.error(request, "The password reset link is invalid or has expired.")
-#             return redirect('accounts:signin')
-
-#     def post(self, request, uidb64, token):
-#         try:
-#             uid = urlsafe_base64_decode(uidb64).decode()
-#             user = User.objects.get(pk=uid)
-#         except (User.DoesNotExist, ValueError):
-#             user = None
-
-#         if user and default_token_generator.check_token(user, token):
-#             form = SetPasswordForm(user, request.POST)
-#             if form.is_valid():
-#                 form.save()
-#                 messages.success(request, "Your password has been reset successfully. Please sign in.")
-#                 return redirect('accounts:signin')
-#             return render(request, self.template_name, {'form': form, 'uidb64': uidb64, 'token': token})
-#         else:
-#             messages.error(request, "The password reset link is invalid.")
-#             return redirect('accounts:signin')
 
 
 

@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Accounts{% endblock %}
+
+{% with False as is_signin_page %}
+{% with False as is_signup_page %}
+{% with True as show_navbar %}
+
+{% block default_content %}
+
+<!-- Service 2 - Bootstrap Brain Component -->
+<section class="py-5 px-5 py-xl-8 px-xl-5 bg-light">
+  <div class="container">
+    <div class="row justify-content-md-center ">
+      <div class="col-12 col-md-10 col-lg-8 col-xl-7 col-xxl-6">
+        <h2 class="mb-4 display-5 text-center">Departments</h2>
+        <hr class="w-50 mx-auto mb-5 mb-xl-9 border-dark-subtle">
+      </div>
+    </div>
+  </div>
+
+  <div class="container overflow-hidden d-flex flex-column align-items-center text-center">
+    <div class="row gy-5 gx-md-5 justify-content-center ">
+      <div class="col-10 col-md-5 col-xl-4 overflow-hidden ">
+        <div class="row gy-4">
+          <a href="{% url 'adminapp:employee-list' %}" class = 'd-flex align-items-center text-decoration-none text-dark'>
+            <div class="col-12 col-lg-2">
+                <img src="{% static 'assets/images/business-people.png' %}" alt="All Employees" width="42" height="42" class="text-primary">
+            </div>
+            <div class="col-12 col-lg-10">
+              <h4 class="mb-3">All Employees</h4>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="col-10 col-md-5 col-xl-4 overflow-hidden ">
+        <div class="row gy-4">
+          <div class="col-12 col-lg-2">
+            <img src="{% static 'assets/images/coordination.png' %}" alt="Co-ordinates" width="42" height="42" class="text-primary">
+          </div>
+          <div class="col-12 col-lg-10">
+            <h4 class="mb-3">Co-ordinates</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-10 col-md-5 col-xl-4 overflow-hidden ">
+        <div class="row gy-4">
+          <div class="col-12 col-lg-2">
+            <img src="{% static 'assets/images/annotators.png' %}" alt="Annotators" width="42" height="42" class="text-primary">
+            
+          </div>
+          <div class="col-12 col-lg-10">
+            <h4 class="mb-3">Annotators</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-10 col-md-5 col-xl-4 overflow-hidden ">
+        <div class="row gy-4">
+          <div class="col-12 col-lg-2">
+            <img src="{% static 'assets/images/hr.png' %}" alt="HR Team" width="42" height="42" class="text-primary">
+          </div>
+          <div class="col-12 col-lg-10">
+            <h4 class="mb-3">HR Team</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-10 col-md-5 col-xl-4 overflow-hidden ">
+        <div class="row gy-4">
+          <div class="col-12 col-lg-2">
+            <img src="{% static 'assets/images/technical.png' %}" alt="Technical" width="42" height="42" class="text-primary">
+          </div>
+          <div class="col-12 col-lg-10">
+            <h4 class="mb-3">Technical</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-10 col-md-5 col-xl-4 overflow-hidden ">
+        <div class="row gy-4">
+          <div class="col-12 col-lg-2">
+            <img src="{% static 'assets/images/public-relation.png' %}" alt="PR Team" width="42" height="42" class="text-primary">
+          </div>
+          <div class="col-12 col-lg-10">
+            <h4 class="mb-3">PR Team</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-10 col-md-5 col-xl-4 overflow-hidden ">
+        <div class="row gy-4">
+          <div class="col-12 col-lg-2">
+            <img src="{% static 'assets/images/pci.png' %}" alt="BD Team" width="42" height="42" class="text-primary">
+          </div>
+          <div class="col-12 col-lg-10">
+            <h4 class="mb-3">BD Team</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-10 col-md-5 col-xl-4 overflow-hidden ">
+        <div class="row gy-4">
+          <div class="col-12 col-lg-2">
+            <img src="{% static 'assets/images/design.png' %}" alt="Designing" width="42" height="42" class="text-primary">
+          </div>
+          <div class="col-12 col-lg-10">
+            <h4 class="mb-3">Designing</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-10 col-md-5 col-xl-4 overflow-hidden ">
+        <div class="row gy-4">
+          <div class="col-12 col-lg-2">
+            <img src="{% static 'assets/images/executive.png' %}" alt="Operations" width="42" height="42" class="text-primary">
+          </div>
+          <div class="col-12 col-lg-10">
+            <h4 class="mb-3">Operations</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-10 col-md-5 col-xl-4 overflow-hidden ">
+        <div class="row gy-4">
+          <div class="col-12 col-lg-2">
+            <img src="{% static 'assets/images/administration.png' %}" alt="Administration" width="42" height="42" class="text-primary">
+          </div>
+          <div class="col-12 col-lg-10">
+            <h4 class="mb-3">Administration</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-10 col-md-5 col-xl-4 overflow-hidden ">
+        <div class="row gy-4">
+          <div class="col-12 col-lg-2">
+            <img src="{% static 'assets/images/team.png' %}" alt="Managers" width="42" height="42" class="text-primary">
+          </div>
+          <div class="col-12 col-lg-10">
+            <h4 class="mb-3">Managers</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-10 col-md-5 col-xl-4 overflow-hidden ">
+        <div class="row gy-4">
+          <div class="col-12 col-lg-2">
+            <img src="{% static 'assets/images/database.png' %}" alt="Data Security" width="42" height="42" class="text-primary">
+          </div>
+          <div class="col-12 col-lg-10">
+            <h4 class="mb-3">Data Security</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% endwith %}
+{% endwith %}
+{% endwith %}

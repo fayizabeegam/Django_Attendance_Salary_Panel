@@ -5,7 +5,7 @@ from django.db import models
 
 class Employee(models.Model):
     IFID = models.CharField(max_length=20,unique=True)
-    EmpName = models.CharField(max_length=150)
+    EmpName = models.CharField(max_length=150,db_index=True)
     Mobile = models.CharField(max_length=10)
     excelFile = models.FileField(upload_to='EmployeeList/',blank=True,null=True)
 
@@ -23,21 +23,25 @@ class AttendanceMonth(models.Model):
     Month = models.CharField(max_length=20,choices=MONTH_CHOICES)
     Year = models.IntegerField()
 
+    class Meta:
+        unique_together = ('Month', 'Year')  # Ensure unique month-year pair
+
     def __str__(self):
-        return f"{self.Month} ({self.Year})"
+        return f"{dict(self.MONTH_CHOICES)[self.Month]} ({self.Year})"
 
 
 class AttendanceSheet(models.Model):
-    Month = models.ForeignKey(AttendanceMonth, on_delete=models.CASCADE)
+    Month = models.ForeignKey(AttendanceMonth, on_delete=models.CASCADE, related_name="attendance_sheets")
     AttendanceFile = models.FileField(upload_to='attendance_sheets/')
 
     def __str__(self):
         return f"Attendance sheet for {self.Month}"
     
 class Attendance(models.Model):
-    Employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    Employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="attendances")
     User = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
-    Month = models.ForeignKey(AttendanceMonth, on_delete=models.CASCADE)
+    Month = models.ForeignKey(AttendanceMonth, on_delete=models.CASCADE, related_name="attendances")
+    AttendanceSheet = models.ForeignKey(AttendanceSheet, on_delete=models.CASCADE, related_name="attendances")
     WFH = models.IntegerField(default=0)
     WFO = models.IntegerField(default=0)
     OT = models.IntegerField(default=0)
